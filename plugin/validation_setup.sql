@@ -106,6 +106,8 @@ declare
 	_report text;
 	_entity text;
 begin
+	--CALL validation.cap_temp_io_concurrency();
+
 	select query, query_nd2, report, entity from validation.rules where code=_code and vrs=any(versoes) into _query, _query_nd2, _report, _entity;
 
 	if _query is not null then
@@ -480,6 +482,8 @@ declare
 	_entity text;
 	_is_global boolean;
 begin
+	--CALL validation.cap_temp_io_concurrency();
+
 	select query, query_nd2, report, entity, is_global from validation.rules_area where code=_code and vrs=any(versoes) into _query, _query_nd2, _report, _entity, _is_global;
 
 	if exists (
@@ -1643,6 +1647,16 @@ BEGIN
 END;
 $$;
 
+CREATE OR REPLACE PROCEDURE validation.cap_temp_io_concurrency()
+LANGUAGE plpgsql
+AS $$
+BEGIN
+	IF current_setting('effective_io_concurrency')::int > 16 THEN
+		EXECUTE 'SET LOCAL effective_io_concurrency = 16';
+	END IF;
+END;
+$$;
+
 
 create or replace function validation.re4_6_validation (ndd integer, sect geometry, _args json) returns table (total int, good int, bad int) as $$
 declare
@@ -1751,6 +1765,8 @@ declare
 	count_good integer := 0;
 	count_bad integer := 0;
 begin
+	CALL validation.cap_temp_io_concurrency();
+
 	CREATE SCHEMA IF NOT EXISTS errors;
 	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_eixo_re4_7 (LIKE {schema}.curso_de_agua_eixo INCLUDING ALL);
 	ALTER TABLE errors.curso_de_agua_eixo_re4_7 ADD COLUMN IF NOT EXISTS entidade text;
@@ -3263,6 +3279,8 @@ declare
 	count_good integer := 0;
 	count_bad integer := 0;
 begin
+	CALL validation.cap_temp_io_concurrency();
+
 	CREATE SCHEMA IF NOT EXISTS errors;
 	CREATE TABLE IF NOT EXISTS errors.curso_de_agua_eixo_re4_8_2 (like {schema}.curso_de_agua_eixo INCLUDING ALL);
 
