@@ -24,6 +24,7 @@ import os.path
 from qgis.PyQt.QtCore import QT_VERSION_STR, QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
+from qgis.utils import pluginMetadata
 
 from .main_dialog import MainDialog
 from .convert_dialog import ConvertDialog
@@ -71,7 +72,9 @@ class recartDGT:
         self.dlgC = ConvertDialog(self.iface)
         self.dlgV = ValidationDialog(self.iface)
 
-        title = self.dlg.windowTitle()
+        version = pluginMetadata('recartDGT', 'version')
+        title = f"{self.dlg.windowTitle()} — {version}"
+
         self.dlg.setWindowTitle(title)
         self.dlgC.setWindowTitle(title)
         self.dlgV.setWindowTitle(title)
